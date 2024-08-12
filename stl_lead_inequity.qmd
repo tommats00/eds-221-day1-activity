@@ -1,0 +1,89 @@
+---
+title: "St. Louis Leads Inequity"
+author: "Tom Gibbens-Matsuyama"
+format: html
+editor: visual
+execute: 
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+## Load Libraries
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+## Load in Data Frame
+
+```{r}
+stl_lead <- read_csv(here::here("data", "stl_blood_lead.csv"))
+
+# Clean variables
+stl_lead <- stl_lead %>% clean_names()
+
+# Look at the Data Before doing anything
+dim(stl_lead)
+skimr::skim(stl_lead)
+names(stl_lead)
+```
+
+## Create a new data frame with a new column
+
+```{r}
+## Creating new data frame named stl_lead_prop w/ col prop_white
+stl_lead_prop <- stl_lead %>% 
+  dplyr::mutate(prop_white = (white / total_pop) * 100)
+```
+
+## Creating a Scatter Plot
+
+```{r}
+stl_lead_plot <- ggplot(data = stl_lead_prop, aes(x = pct_elevated,
+                                 y = prop_white)) +
+  geom_point(aes(color = pct_elevated, 
+                 size = 3,
+                 alpha = 0.1), show.legend = FALSE) +
+  scale_color_gradient(low = "blue", high = "orange") +
+  theme_minimal() +
+  geom_abline() + 
+    labs(title = "Title Name")
+  
+stl_lead_plot
+# 
+
+```
+
+
+## Save as a png file
+
+```{r}
+ggsave(here::here("figs", "stl_lead_inequity.png"), height = 6, width = 5) 
+```
+
+## Create a Histogram 
+
+```{r}
+ggplot(data = stl_lead_prop, aes(x = pct_elevated)) +
+  geom_histogram(fill = "yellow", 
+                 color = "red",
+                 size = 0.1,
+                 alpha = 0.5) +
+  theme_minimal() +
+  labs("title = Elevated Blood Lead Levels in St. Louis",
+       y = "Elevated Blood Lead Levels",
+       x = "Frequency")
+
+
+```
+
+## Save as a jpg file 
+
+```{r}
+ggsave(here::here("figs", "stl_lead_inequity_hist.jpg"))
+```
+
+
